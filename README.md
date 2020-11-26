@@ -13,3 +13,4 @@ Pasos para la ejecución correcta del programa:
 --------------------------------**ATENCIÓN**--------------------------------
 
 Si no realizas todos los pasos, el programa te avisará, se cerrará y deberás iniciarlo de nuevo (volver al paso 1).
+Si no hay ingresos en la base de datos, la suma de los ingresos te dará 0. Asegurate de haber ejecutado antes la primera parte de la práctica.

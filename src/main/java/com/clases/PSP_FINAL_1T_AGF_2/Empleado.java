@@ -40,7 +40,6 @@ public class Empleado extends Thread {
 
 
     public void leerDatos(int indice, int ingresosBBDD) {
-
         try {
             for (int j = (numRegistrosPorHilo * indice) + 1; j <= numRegistrosPorHilo * (indice + 1); j++) {
                 ingresos = (int) (Math.random() * 990) + 10;

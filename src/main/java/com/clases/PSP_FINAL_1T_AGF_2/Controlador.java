@@ -48,6 +48,7 @@ public class Controlador {
         }
 
         //Tengo que sincronizar los hilos (????????????) porque si no, no suma bien los salarios
+
         for (int j = 0; j < arrayEmpleados.size(); j++) {
             arrayEmpleados.get(j).start();
             ingresosBBDD += arrayEmpleados.get(j).getIngresosBBDD();

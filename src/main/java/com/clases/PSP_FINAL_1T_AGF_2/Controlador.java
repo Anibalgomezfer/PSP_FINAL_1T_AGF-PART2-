@@ -2,17 +2,18 @@ package com.clases.PSP_FINAL_1T_AGF_2;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.concurrent.Semaphore;
 
 public class Controlador {
     public static void main(String[] args) {
         int numRegistros = 0;
         int numHilos = 5;
-        int ingresosBBDD = 0;
+        final int ingresosBBDD = 0;
+
 
         ArrayList<Empleado> arrayEmpleados = new ArrayList<>();
-        leerRegistrosHilos(numRegistros, numHilos, ingresosBBDD, arrayEmpleados);
         leerRegistrosSecuencial(numRegistros, ingresosBBDD);
-
+        leerRegistrosHilos(numRegistros, numHilos, ingresosBBDD, arrayEmpleados);
 
     }
 
@@ -23,11 +24,9 @@ public class Controlador {
         try {
             Connection conexion = DriverManager.getConnection("jdbc:mysql://localhost/bbdd_psp_1", "DAM2020_PSP", "DAM2020_PSP");
             Statement consulta = conexion.createStatement();
-            ResultSet resultSet = consulta.executeQuery("SELECT COUNT(*) from empleados");
-            while (resultSet.next()) {
-                numRegistros = resultSet.getInt(1);
-            }
-
+            ResultSet resultSet = consulta.executeQuery("SELECT COUNT(ID) from empleados");
+            resultSet.next();
+            numRegistros = resultSet.getInt(1);
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -38,19 +37,28 @@ public class Controlador {
         for (int indice = 0; indice < numHilos; indice++) {
             if (indice == (numHilos-1)){
                 numRegistrosPorHilo = numRegistrosPorHilo+modulo;
-                Empleado hilo = new Empleado(numRegistros, numHilos, numRegistrosPorHilo, indice, modulo);
+                Empleado hilo = new Empleado(numRegistrosPorHilo, indice);
                 arrayEmpleados.add(hilo);
             }else{
                 modulo=0;
-                Empleado hilo = new Empleado(numRegistros, numHilos, numRegistrosPorHilo, indice, modulo);
+                Empleado hilo = new Empleado(numRegistrosPorHilo, indice);
                 arrayEmpleados.add(hilo);
             }
         }
 
-        //Tengo que sincronizar los hilos (????????????) porque si no, no suma bien los salarios
-
         for (int j = 0; j < arrayEmpleados.size(); j++) {
             arrayEmpleados.get(j).start();
+        }
+
+        arrayEmpleados.forEach(empleado -> {
+            try {
+                empleado.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+
+        for (int j = 0; j < arrayEmpleados.size(); j++) {
             ingresosBBDD += arrayEmpleados.get(j).getIngresosBBDD();
         }
 
